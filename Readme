@@ -1,0 +1,43 @@
+
+SysPro Project 2 
+-------------------------------------------------------------------------------------------
+
+TO RUN: make poller
+        ./poller 5634 8 16 pollLog.txt pollStats.txt
+
+        make pollSwayer
+        ./pollSwayer linux01.di.uoa.gr 5634 inputFile.txt
+
+Termination: Give a Ctrl+C signal
+
+-----poller.c------------------------------------------------------------------------------
+
+main(): 
+The main function creates the master thread and the worker threads and waits for them to finish.
+
+masterThread(): 
+In General the function:
+1. Sets up a socket
+2. Listens for incoming connections
+3. Buffers the connections onto a shared buffer
+
+More specific this function is responsible for accepting incoming connections. This is being accompilshed via a socket, which is being added to the buffer if there is space in it and the condition variable is signaled to notify the worker threads that there is a new connection. Otherwise it puts the thread to sleep until space is available.
+
+workerThread():
+In General the function:
+1. Receives client connections from the buffer
+2. Updates the poll statistics
+3. Updates the polllog file
+
+More specific this function waits until a connection is available in the buffer. When this happens it recieves a message with the name, surname and the vote from the client and after checking for double-voting it updates the pollStats and the pollLog files. 
+
+
+-----pollSwayer.c--------------------------------------------------------------------------
+
+main(): 
+The main function creates a thread to send votes to the server and waits for it to finish.
+
+sendVote(): This function is responsible for sending votes to the server. It opens the input file and for each line (containing a name, surname, and vote), it creates a socket and initiates a connection with the server. It constructs a message and sends it to it. 
+
+
+
